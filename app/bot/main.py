@@ -10,7 +10,7 @@ from .handlers import (get_auth_handler, get_ocr_handler, get_manual_bp_handler,
                        get_profile_handler, get_delete_handler, get_edit_handler,
                        get_password_handler, get_deactivate_handler,
                        get_broadcast_handler, get_notification_settings_handler,
-                       stats, help_command, unknown, unknown_command, bp_command,
+                       stats, help_command, unknown, unknown_command, cancel, bp_command,
                        language_command, language_callback,
                        settings_command, settings_callback, timezone_callback,
                        notification_callback)
@@ -271,6 +271,10 @@ def build_application():
     application.add_handler(CallbackQueryHandler(settings_callback, pattern='^settings_'))
     application.add_handler(CallbackQueryHandler(timezone_callback, pattern='^tz_'))
     application.add_handler(CallbackQueryHandler(notification_callback, pattern='^notif_(menu|toggle|del:)'))
+
+    # /cancel outside a conversation — inside one, the ConversationHandler
+    # fallbacks above match first, so this only fires when nothing is active.
+    application.add_handler(CommandHandler("cancel", cancel))
 
     # Fallback for unknown messages (Must be last)
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
